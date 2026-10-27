@@ -35,8 +35,8 @@ button{font:inherit;cursor:pointer}
 .chip{background:var(--gris);border:1px solid var(--borde);border-radius:999px;padding:6px 12px;font-size:14px}
 .chip b{color:var(--azul)}
 label.lb{display:block;font-size:13px;font-weight:700;margin:10px 0 4px;color:#3b4a58}
-input[type=text],input[type=number],textarea{width:100%;font:inherit;padding:12px;border:1.5px solid var(--borde);border-radius:10px;background:#fff;color:var(--txt)}
-input:focus,textarea:focus{outline:3px solid #9cc7e6;border-color:var(--azul)}
+input[type=text],input[type=number],select,textarea{width:100%;font:inherit;padding:12px;border:1.5px solid var(--borde);border-radius:10px;background:#fff;color:var(--txt)}
+input:focus,select:focus,textarea:focus{outline:3px solid #9cc7e6;border-color:var(--azul)}
 .seg{display:flex;gap:8px}
 .seg button{flex:1;min-height:48px;border:1.5px solid var(--borde);background:#fff;border-radius:10px;font-weight:700;color:#3b4a58}
 .seg button.on{background:var(--azul);border-color:var(--azul);color:#fff}
@@ -326,7 +326,8 @@ const CONFIG = {
   NOMBRE_CHECKLIST: "Molino de cemento - Periféricos",   // texto que se guarda en la columna "Checklist" del Sheets
   PREFIJO_ID: "MCP",        // prefijo del ID de registro (separa los checklists en el Sheets)
   ID_APP: "mc-perifericos",              // nombre interno: mantiene separados los borradores de cada checklist en el celular
-  SUPERVISOR: false        // true = pide el nombre del supervisor
+  SUPERVISOR: true,        // true = pide elegir el nombre del supervisor
+  SUPERVISORES: ["Cuper Alcalde", "Daniel Velásquez", "Petter Ríos"]
 };
 /* ===================================================================== */
 
@@ -512,7 +513,10 @@ function renderApp(){
     <label class="lb" for="f-operador">Operador</label>
     <input type="text" id="f-operador" data-f="operador" autocomplete="name" placeholder="Nombre y apellido" value="${esc(S.operador)}">
     ${CONFIG.SUPERVISOR ? `<label class="lb" for="f-supervisor">Supervisor</label>
-    <input type="text" id="f-supervisor" data-f="supervisor" autocomplete="off" placeholder="Nombre y apellido" value="${esc(S.supervisor)}">` : ''}
+    <select id="f-supervisor" data-f="supervisor">
+      <option value="">Seleccione un supervisor</option>
+      ${CONFIG.SUPERVISORES.map(nombre => `<option value="${esc(nombre)}" ${S.supervisor === nombre ? 'selected' : ''}>${esc(nombre)}</option>`).join('')}
+    </select>` : ''}
     <label class="lb" for="f-semana">Semana</label>
     <input type="text" id="f-semana" data-f="semana" inputmode="numeric" maxlength="6" placeholder="Ej. 38" value="${esc(S.semana)}">
   </section>
@@ -558,7 +562,7 @@ function faltantes(){
   const f = [];
   if (!S.turno) f.push({ sel:'#f-turno', msg:'Seleccione el turno' });
   if (limpiar(S.operador).length < 3) f.push({ sel:'#f-operador', msg:'Escriba el nombre del operador' });
-  if (CONFIG.SUPERVISOR && limpiar(S.supervisor).length < 3) f.push({ sel:'#f-supervisor', msg:'Escriba el nombre del supervisor' });
+  if (CONFIG.SUPERVISOR && !CONFIG.SUPERVISORES.includes(S.supervisor)) f.push({ sel:'#f-supervisor', msg:'Seleccione un supervisor' });
   if (!limpiar(S.semana)) f.push({ sel:'#f-semana', msg:'Escriba la semana' });
   CAT.eqs.forEach(e => {
     const st = S.eq[e.id];
@@ -778,5 +782,6 @@ setInterval(() => { const d = new Date(), f = $('#r-fecha'), h = $('#r-hora'); i
 })();
 })();
 </script>
-</body>
+<script>window.__CF$cv$params={r:'a51401b7f9b44c58',t:'MTc5MzEyODI4Nw==',u:'01a17ec650be70d69ac9048c928234a3',ut:'ZS22Jrjo8DWeMpH6qz6gYKoMsWwyt2rYjlsBS6eB0ws-1793128288-1.2.1.1-XkNh1r3YUq838GG84PzSojz0cfXSfYacG_c9jBrxbYzLUZfFcVQu_pQIrheo3OSQM2E4MXqFNTUxzTR7_sXQCSd3r6FHzGQf6rW_eKMlLt0',i:60};(function(){if(!document.body)return;var s=document.createElement('script');s.src='/cdn-cgi/challenge-platform/scripts/precursor/main.js';document.head.appendChild(s);})();</script></body>
 </html>
+
